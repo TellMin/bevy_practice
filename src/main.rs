@@ -67,7 +67,9 @@ fn main() {
                 // `chain`ing systems together runs them in order
                 .chain(),
         )
-        .add_systems(Update, (update_scoreboard, bevy::window::close_on_esc))
+        .add_systems(Update, update_scoreboard)
+        .add_systems(Update, bevy::window::close_on_esc)
+        .add_systems(Update, restart_game)
         .run();
 }
 
@@ -411,5 +413,32 @@ fn play_collision_sound(
             // auto-despawn the entity when playback finishes
             settings: PlaybackSettings::DESPAWN,
         });
+    }
+}
+
+fn restart_game(
+    mut commands: Commands,
+    keyboard_input: Res<Input<KeyCode>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    query: Query<Entity, With<Ball>>,
+) {
+    if keyboard_input.just_pressed(KeyCode::R) {
+        for entity in query.iter() {
+            commands.entity(entity).despawn();
+        }
+
+        let material = materials.add(ColorMaterial::from(BALL_COLOR));
+        commands.spawn((
+            MaterialMesh2dBundle {
+                mesh: meshes.add(shape::Circle::default().into()).into(),
+                material: material.clone(),
+                transform: Transform::from_translation(BALL_STARTING_POSITION)
+                    .with_scale(BALL_SIZE),
+                ..default()
+            },
+            Ball,
+            Velocity(INITIAL_BALL_DIRECTION.normalize() * BALL_SPEED),
+        ));
     }
 }
