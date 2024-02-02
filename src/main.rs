@@ -69,7 +69,7 @@ fn main() {
         )
         .add_systems(Update, update_scoreboard)
         .add_systems(Update, bevy::window::close_on_esc)
-        .add_systems(Update, restart_game)
+        .add_systems(Update, respawn_bricks)
         .run();
 }
 
@@ -249,6 +249,13 @@ fn setup(
     commands.spawn(WallBundle::new(WallLocation::Bottom));
     commands.spawn(WallBundle::new(WallLocation::Top));
 
+    spawn_brick(&mut commands);
+}
+
+fn spawn_brick(commands: &mut Commands) {
+    // Paddle
+    let paddle_y = BOTTOM_WALL + GAP_BETWEEN_PADDLE_AND_FLOOR;
+
     // Bricks
     let total_width_of_bricks = (RIGHT_WALL - LEFT_WALL) - 2. * GAP_BETWEEN_BRICKS_AND_SIDES;
     let bottom_edge_of_bricks = paddle_y + GAP_BETWEEN_PADDLE_AND_BRICKS;
@@ -266,10 +273,10 @@ fn setup(
     // the space on the top and sides of the bricks only captures a lower bound, not an exact value
     let center_of_bricks = (LEFT_WALL + RIGHT_WALL) / 2.0;
     let left_edge_of_bricks = center_of_bricks
-        // Space taken up by the bricks
-        - (n_columns as f32 / 2.0 * BRICK_SIZE.x)
-        // Space taken up by the gaps
-        - n_vertical_gaps as f32 / 2.0 * GAP_BETWEEN_BRICKS;
+            // Space taken up by the bricks
+            - (n_columns as f32 / 2.0 * BRICK_SIZE.x)
+            // Space taken up by the gaps
+            - n_vertical_gaps as f32 / 2.0 * GAP_BETWEEN_BRICKS;
 
     // In Bevy, the `translation` of an entity describes the center point,
     // not its bottom-left corner
@@ -416,29 +423,16 @@ fn play_collision_sound(
     }
 }
 
-fn restart_game(
+fn respawn_bricks(
     mut commands: Commands,
     keyboard_input: Res<Input<KeyCode>>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    query: Query<Entity, With<Ball>>,
+    brick_query: Query<Entity, With<Brick>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::R) {
-        for entity in query.iter() {
-            commands.entity(entity).despawn();
+        for brick_entity in &brick_query {
+            commands.entity(brick_entity).despawn();
         }
 
-        let material = materials.add(ColorMaterial::from(BALL_COLOR));
-        commands.spawn((
-            MaterialMesh2dBundle {
-                mesh: meshes.add(shape::Circle::default().into()).into(),
-                material: material.clone(),
-                transform: Transform::from_translation(BALL_STARTING_POSITION)
-                    .with_scale(BALL_SIZE),
-                ..default()
-            },
-            Ball,
-            Velocity(INITIAL_BALL_DIRECTION.normalize() * BALL_SPEED),
-        ));
+        spawn_brick(&mut commands);
     }
 }
