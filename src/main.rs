@@ -8,6 +8,7 @@ mod collision_sound;
 mod constants;
 mod paddle;
 mod velocity;
+mod wall_bundle;
 
 use ball::Ball;
 use bevy::{
@@ -22,6 +23,7 @@ use collision_sound::CollisionSound;
 use constants::*;
 use paddle::Paddle;
 use velocity::Velocity;
+use wall_bundle::WallBundle;
 
 fn main() {
     App::new()
@@ -47,15 +49,6 @@ fn main() {
         .add_systems(Update, bevy::window::close_on_esc)
         .add_systems(Update, respawn_bricks)
         .run();
-}
-
-// This bundle is a collection of the components that define a "wall" in our game
-#[derive(Bundle)]
-struct WallBundle {
-    // You can nest bundles inside of other bundles like this
-    // Allowing you to compose their functionality
-    sprite_bundle: SpriteBundle,
-    collider: Collider,
 }
 
 /// Which side of the arena is this wall located on?
