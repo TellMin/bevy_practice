@@ -1,6 +1,7 @@
 //! A simplified implementation of the classic game "Breakout".
 
 mod constants;
+mod paddle;
 
 use bevy::{
     prelude::*,
@@ -8,6 +9,7 @@ use bevy::{
     sprite::MaterialMesh2dBundle,
 };
 use constants::*;
+use paddle::Paddle;
 
 fn main() {
     App::new()
@@ -34,9 +36,6 @@ fn main() {
         .add_systems(Update, respawn_bricks)
         .run();
 }
-
-#[derive(Component)]
-struct Paddle;
 
 #[derive(Component)]
 struct Ball;
