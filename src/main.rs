@@ -4,6 +4,7 @@ mod ball;
 mod brick;
 mod colider;
 mod colision_event;
+mod collision_sound;
 mod constants;
 mod paddle;
 mod velocity;
@@ -17,6 +18,7 @@ use bevy::{
 use brick::Brick;
 use colider::Collider;
 use colision_event::CollisionEvent;
+use collision_sound::CollisionSound;
 use constants::*;
 use paddle::Paddle;
 use velocity::Velocity;
@@ -46,9 +48,6 @@ fn main() {
         .add_systems(Update, respawn_bricks)
         .run();
 }
-
-#[derive(Resource)]
-struct CollisionSound(Handle<AudioSource>);
 
 // This bundle is a collection of the components that define a "wall" in our game
 #[derive(Bundle)]
@@ -140,7 +139,7 @@ fn setup(
 
     // Sound
     let ball_collision_sound = asset_server.load("sounds/breakout_collision.ogg");
-    commands.insert_resource(CollisionSound(ball_collision_sound));
+    commands.insert_resource(CollisionSound::new(ball_collision_sound));
 
     // Paddle
     let paddle_y = BOTTOM_WALL + GAP_BETWEEN_PADDLE_AND_FLOOR;
@@ -372,7 +371,7 @@ fn play_collision_sound(
         // This prevents events staying active on the next frame.
         collision_events.clear();
         commands.spawn(AudioBundle {
-            source: sound.0.clone(),
+            source: sound.get_source(),
             // auto-despawn the entity when playback finishes
             settings: PlaybackSettings::DESPAWN,
         });
