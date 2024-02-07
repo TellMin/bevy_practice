@@ -7,6 +7,7 @@ mod colision_event;
 mod collision_sound;
 mod constants;
 mod paddle;
+mod score_board;
 mod velocity;
 mod wall_bundle;
 mod wall_location;
@@ -23,6 +24,7 @@ use colision_event::CollisionEvent;
 use collision_sound::CollisionSound;
 use constants::*;
 use paddle::Paddle;
+use score_board::Scoreboard;
 use velocity::Velocity;
 use wall_bundle::WallBundle;
 use wall_location::WallLocation;
@@ -51,12 +53,6 @@ fn main() {
         .add_systems(Update, bevy::window::close_on_esc)
         .add_systems(Update, respawn_bricks)
         .run();
-}
-
-// This resource tracks the game's score
-#[derive(Resource)]
-struct Scoreboard {
-    score: usize,
 }
 
 // Add the game's entities to our world
