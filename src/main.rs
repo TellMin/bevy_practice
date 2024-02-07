@@ -1,6 +1,7 @@
 //! A simplified implementation of the classic game "Breakout".
 
 mod ball;
+mod brick;
 mod colider;
 mod colision_event;
 mod constants;
@@ -13,6 +14,7 @@ use bevy::{
     sprite::collide_aabb::{collide, Collision},
     sprite::MaterialMesh2dBundle,
 };
+use brick::Brick;
 use colider::Collider;
 use colision_event::CollisionEvent;
 use constants::*;
@@ -44,9 +46,6 @@ fn main() {
         .add_systems(Update, respawn_bricks)
         .run();
 }
-
-#[derive(Component)]
-struct Brick;
 
 #[derive(Resource)]
 struct CollisionSound(Handle<AudioSource>);
