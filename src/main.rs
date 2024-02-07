@@ -3,6 +3,7 @@
 mod ball;
 mod constants;
 mod paddle;
+mod velocity;
 
 use ball::Ball;
 use bevy::{
@@ -12,6 +13,7 @@ use bevy::{
 };
 use constants::*;
 use paddle::Paddle;
+use velocity::Velocity;
 
 fn main() {
     App::new()
@@ -38,9 +40,6 @@ fn main() {
         .add_systems(Update, respawn_bricks)
         .run();
 }
-
-#[derive(Component, Deref, DerefMut)]
-struct Velocity(Vec2);
 
 #[derive(Component)]
 struct Collider;
@@ -175,7 +174,7 @@ fn setup(
             ..default()
         },
         Ball,
-        Velocity(INITIAL_BALL_DIRECTION.normalize() * BALL_SPEED),
+        Velocity::new(INITIAL_BALL_DIRECTION.normalize() * BALL_SPEED),
     ));
 
     // Scoreboard
