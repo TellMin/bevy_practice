@@ -1,6 +1,7 @@
 //! A simplified implementation of the classic game "Breakout".
 
 mod ball;
+mod colider;
 mod constants;
 mod paddle;
 mod velocity;
@@ -11,6 +12,7 @@ use bevy::{
     sprite::collide_aabb::{collide, Collision},
     sprite::MaterialMesh2dBundle,
 };
+use colider::Collider;
 use constants::*;
 use paddle::Paddle;
 use velocity::Velocity;
@@ -40,9 +42,6 @@ fn main() {
         .add_systems(Update, respawn_bricks)
         .run();
 }
-
-#[derive(Component)]
-struct Collider;
 
 #[derive(Event, Default)]
 struct CollisionEvent;
