@@ -1,8 +1,10 @@
 //! A simplified implementation of the classic game "Breakout".
 
+mod ball;
 mod constants;
 mod paddle;
 
+use ball::Ball;
 use bevy::{
     prelude::*,
     sprite::collide_aabb::{collide, Collision},
@@ -36,9 +38,6 @@ fn main() {
         .add_systems(Update, respawn_bricks)
         .run();
 }
-
-#[derive(Component)]
-struct Ball;
 
 #[derive(Component, Deref, DerefMut)]
 struct Velocity(Vec2);
