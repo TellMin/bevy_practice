@@ -2,6 +2,7 @@
 
 mod ball;
 mod colider;
+mod colision_event;
 mod constants;
 mod paddle;
 mod velocity;
@@ -13,6 +14,7 @@ use bevy::{
     sprite::MaterialMesh2dBundle,
 };
 use colider::Collider;
+use colision_event::CollisionEvent;
 use constants::*;
 use paddle::Paddle;
 use velocity::Velocity;
@@ -42,9 +44,6 @@ fn main() {
         .add_systems(Update, respawn_bricks)
         .run();
 }
-
-#[derive(Event, Default)]
-struct CollisionEvent;
 
 #[derive(Component)]
 struct Brick;
