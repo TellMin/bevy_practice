@@ -1,10 +1,9 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
 // Temporary import
-use crate::spawn_brick;
 use crate::{
     ball::Ball, colider::Collider, collision_sound::CollisionSound, constants::*, paddle::Paddle,
-    velocity::Velocity, wall_bundle::WallBundle, wall_location::WallLocation,
+    spawner, velocity::Velocity, wall_bundle::WallBundle, wall_location::WallLocation,
 };
 
 // Add the game's entities to our world
@@ -84,5 +83,5 @@ pub fn setup(
     commands.spawn(WallBundle::new(WallLocation::Bottom));
     commands.spawn(WallBundle::new(WallLocation::Top));
 
-    spawn_brick(&mut commands);
+    spawner::spawn_brick(&mut commands);
 }
