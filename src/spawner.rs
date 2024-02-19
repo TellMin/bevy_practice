@@ -1,6 +1,7 @@
 use crate::{
-    ball::Ball, brick::Brick, colider::Collider, collision_sound::CollisionSound, constants::*,
-    paddle::Paddle, velocity::Velocity, wall_bundle::WallBundle, wall_location::WallLocation,
+    colider::Collider, collision_sound::CollisionSound, component::ball::Ball,
+    component::brick::Brick, constants::*, paddle::Paddle, velocity::Velocity,
+    wall_bundle::WallBundle, wall_location::WallLocation,
 };
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 

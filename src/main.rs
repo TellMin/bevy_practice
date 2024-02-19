@@ -1,11 +1,10 @@
 //! A simplified implementation of the classic game "Breakout".
 
-mod ball;
-mod brick;
 mod colider;
 mod colision_event;
 mod collision;
 mod collision_sound;
+mod component;
 mod constants;
 mod game_setup;
 mod paddle;
@@ -16,10 +15,10 @@ mod velocity;
 mod wall_bundle;
 mod wall_location;
 
-use ball::Ball;
 use bevy::prelude::*;
 use colider::Collider;
 use colision_event::CollisionEvent;
+use component::ball::Ball;
 use constants::*;
 use score_board::Scoreboard;
 use velocity::Velocity;

@@ -1,6 +1,6 @@
 use crate::{
-    brick::Brick, collision_sound::CollisionSound, Ball, Collider, CollisionEvent, Scoreboard,
-    Velocity,
+    collision_sound::CollisionSound, component::brick::Brick, Ball, Collider, CollisionEvent,
+    Scoreboard, Velocity,
 };
 use bevy::{
     prelude::*,
