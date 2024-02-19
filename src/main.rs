@@ -45,13 +45,8 @@ fn main() {
                 // `chain`ing systems together runs them in order
                 .chain(),
         )
-        .add_systems(Update, update_scoreboard)
+        .add_systems(Update, score_board::update_scoreboard)
         .add_systems(Update, bevy::window::close_on_esc)
         .add_systems(Update, spawner::respawn_bricks)
         .run();
-}
-
-fn update_scoreboard(scoreboard: Res<Scoreboard>, mut query: Query<&mut Text>) {
-    let mut text = query.single_mut();
-    text.sections[1].value = scoreboard.score.to_string();
 }
