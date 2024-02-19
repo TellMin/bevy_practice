@@ -8,6 +8,7 @@ mod collision_sound;
 mod constants;
 mod game_setup;
 mod paddle;
+mod physics;
 mod score_board;
 mod spawner;
 mod velocity;
@@ -40,7 +41,7 @@ fn main() {
         .add_systems(
             FixedUpdate,
             (
-                apply_velocity,
+                physics::apply_velocity,
                 paddle::move_paddle,
                 check_for_collisions,
                 play_collision_sound,
@@ -52,13 +53,6 @@ fn main() {
         .add_systems(Update, bevy::window::close_on_esc)
         .add_systems(Update, spawner::respawn_bricks)
         .run();
-}
-
-fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>, time: Res<Time>) {
-    for (mut transform, velocity) in &mut query {
-        transform.translation.x += velocity.x * time.delta_seconds();
-        transform.translation.y += velocity.y * time.delta_seconds();
-    }
 }
 
 fn update_scoreboard(scoreboard: Res<Scoreboard>, mut query: Query<&mut Text>) {
