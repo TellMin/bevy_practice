@@ -145,7 +145,7 @@ fn spawn_brick(commands: &mut Commands) {
 
 pub fn respawn_bricks(
     mut commands: Commands,
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     brick_query: Query<Entity, With<Brick>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::R) {

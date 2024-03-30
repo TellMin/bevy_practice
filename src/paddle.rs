@@ -5,7 +5,7 @@ use bevy::prelude::*;
 pub struct Paddle;
 
 pub fn move_paddle(
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     mut query: Query<&mut Transform, With<Paddle>>,
     time: Res<Time>,
 ) {
