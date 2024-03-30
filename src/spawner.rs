@@ -41,9 +41,10 @@ pub fn spawn_initial_entities(
     // Ball
     commands.spawn((
         MaterialMesh2dBundle {
-            mesh: meshes.add(shape::Circle::default().into()).into(),
+            mesh: meshes.add(Circle::default()).into(),
             material: materials.add(ColorMaterial::from(BALL_COLOR)),
-            transform: Transform::from_translation(BALL_STARTING_POSITION).with_scale(BALL_SIZE),
+            transform: Transform::from_translation(BALL_STARTING_POSITION)
+                .with_scale(Vec2::splat(BALL_DIAMETER).extend(1.)),
             ..default()
         },
         Ball,
