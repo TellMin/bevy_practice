@@ -1,6 +1,6 @@
 use crate::{
     collision_sound::CollisionSound, component::brick::Brick, Ball, Collider, CollisionEvent,
-    Scoreboard, Velocity, BALL_SIZE,
+    Scoreboard, Velocity, BALL_DIAMETER,
 };
 use bevy::{
     math::bounding::{Aabb2d, BoundingCircle},
@@ -19,7 +19,7 @@ pub fn check_for_collisions(
     // check collision with walls
     for (collider_entity, transform, maybe_brick) in &collider_query {
         let collision = collide_with_side(
-            BoundingCircle::new(ball_transform.translation.truncate(), BALL_SIZE / 2.),
+            BoundingCircle::new(ball_transform.translation.truncate(), BALL_DIAMETER / 2.),
             Aabb2d::new(
                 transform.translation.truncate(),
                 transform.scale.truncate() / 2.,
