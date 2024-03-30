@@ -1,7 +1,13 @@
 use crate::{
-    colider::Collider, collision_sound::CollisionSound, component::ball::Ball,
-    component::brick::Brick, constants::*, paddle::Paddle, velocity::Velocity,
-    wall_bundle::WallBundle, wall_location::WallLocation,
+    colider::Collider,
+    collision_sound::CollisionSound,
+    component::ball::Ball,
+    component::brick::{Brick, STAGE_LAYOUT},
+    constants::*,
+    paddle::Paddle,
+    velocity::Velocity,
+    wall_bundle::WallBundle,
+    wall_location::WallLocation,
 };
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
@@ -86,60 +92,47 @@ pub fn spawn_initial_entities(
 }
 
 fn spawn_brick(commands: &mut Commands) {
-    // Paddle
-    let paddle_y = BOTTOM_WALL + GAP_BETWEEN_PADDLE_AND_FLOOR;
+    let brick_size_x = (RIGHT_WALL
+        - LEFT_WALL
+        - GAP_BETWEEN_BRICKS * (STAGE_LAYOUT[0].len() as f32 - 1.0)
+        - GAP_BETWEEN_BRICKS_AND_SIDES * 2.0)
+        / STAGE_LAYOUT[0].len() as f32;
+    let brick_size_y = (TOP_WALL
+        - BOTTOM_WALL
+        - GAP_BETWEEN_BRICKS * (STAGE_LAYOUT.len() as f32 - 1.0)
+        - GAP_BETWEEN_BRICKS_AND_CEILING
+        - GAP_BETWEEN_PADDLE_AND_BRICKS)
+        / STAGE_LAYOUT.len() as f32;
 
-    // Bricks
-    let total_width_of_bricks = (RIGHT_WALL - LEFT_WALL) - 2. * GAP_BETWEEN_BRICKS_AND_SIDES;
-    let bottom_edge_of_bricks = paddle_y + GAP_BETWEEN_PADDLE_AND_BRICKS;
-    let total_height_of_bricks = TOP_WALL - bottom_edge_of_bricks - GAP_BETWEEN_BRICKS_AND_CEILING;
+    let offset_x = LEFT_WALL + brick_size_x / 2. + GAP_BETWEEN_BRICKS_AND_CEILING;
+    let offset_y = TOP_WALL - brick_size_y / 2. - GAP_BETWEEN_BRICKS_AND_SIDES;
 
-    assert!(total_width_of_bricks > 0.0);
-    assert!(total_height_of_bricks > 0.0);
+    for (row_index, row) in STAGE_LAYOUT.iter().enumerate() {
+        for (column_index, &cell) in row.iter().enumerate() {
+            if cell == 1 {
+                let brick_position = Vec2::new(
+                    offset_x + column_index as f32 * (brick_size_x + GAP_BETWEEN_BRICKS),
+                    offset_y - row_index as f32 * (brick_size_y + GAP_BETWEEN_BRICKS),
+                );
 
-    // Given the space available, compute how many rows and columns of bricks we can fit
-    let n_columns = (total_width_of_bricks / (BRICK_SIZE.x + GAP_BETWEEN_BRICKS)).floor() as usize;
-    let n_rows = (total_height_of_bricks / (BRICK_SIZE.y + GAP_BETWEEN_BRICKS)).floor() as usize;
-    let n_vertical_gaps = n_columns - 1;
-
-    // Because we need to round the number of columns,
-    // the space on the top and sides of the bricks only captures a lower bound, not an exact value
-    let center_of_bricks = (LEFT_WALL + RIGHT_WALL) / 2.0;
-    let left_edge_of_bricks = center_of_bricks
-            // Space taken up by the bricks
-            - (n_columns as f32 / 2.0 * BRICK_SIZE.x)
-            // Space taken up by the gaps
-            - n_vertical_gaps as f32 / 2.0 * GAP_BETWEEN_BRICKS;
-
-    // In Bevy, the `translation` of an entity describes the center point,
-    // not its bottom-left corner
-    let offset_x = left_edge_of_bricks + BRICK_SIZE.x / 2.;
-    let offset_y = bottom_edge_of_bricks + BRICK_SIZE.y / 2.;
-
-    for row in 0..n_rows {
-        for column in 0..n_columns {
-            let brick_position = Vec2::new(
-                offset_x + column as f32 * (BRICK_SIZE.x + GAP_BETWEEN_BRICKS),
-                offset_y + row as f32 * (BRICK_SIZE.y + GAP_BETWEEN_BRICKS),
-            );
-
-            // brick
-            commands.spawn((
-                SpriteBundle {
-                    sprite: Sprite {
-                        color: BRICK_COLOR,
+                // brick
+                commands.spawn((
+                    SpriteBundle {
+                        sprite: Sprite {
+                            color: BRICK_COLOR,
+                            ..default()
+                        },
+                        transform: Transform {
+                            translation: brick_position.extend(0.0),
+                            scale: Vec3::new(brick_size_x, brick_size_y, 1.0),
+                            ..default()
+                        },
                         ..default()
                     },
-                    transform: Transform {
-                        translation: brick_position.extend(0.0),
-                        scale: Vec3::new(BRICK_SIZE.x, BRICK_SIZE.y, 1.0),
-                        ..default()
-                    },
-                    ..default()
-                },
-                Brick,
-                Collider,
-            ));
+                    Brick,
+                    Collider,
+                ));
+            }
         }
     }
 }
