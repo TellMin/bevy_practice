@@ -148,7 +148,7 @@ pub fn respawn_bricks(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     brick_query: Query<Entity, With<Brick>>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::R) {
+    if keyboard_input.just_pressed(KeyCode::KeyR) {
         for brick_entity in &brick_query {
             commands.entity(brick_entity).despawn();
         }
