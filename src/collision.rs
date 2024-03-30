@@ -3,7 +3,7 @@ use crate::{
     Scoreboard, Velocity, BALL_DIAMETER,
 };
 use bevy::{
-    math::bounding::{Aabb2d, BoundingCircle},
+    math::bounding::{Aabb2d, BoundingCircle, BoundingVolume, IntersectsVolume},
     prelude::*,
 };
 
