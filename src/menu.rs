@@ -51,7 +51,7 @@ pub fn setup_menu(mut commands: Commands) {
     commands.insert_resource(MenuData { button_entity });
 }
 
-pub fn menu(
+pub fn menu_action(
     mut next_state: ResMut<NextState<AppState>>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor),
