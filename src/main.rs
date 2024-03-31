@@ -33,8 +33,11 @@ fn main() {
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .init_state::<AppState>()
         .add_event::<CollisionEvent>()
-        .add_systems(OnEnter(AppState::InGame), game_setup::setup)
+        .add_systems(Update, bevy::window::close_on_esc)
         .add_systems(OnEnter(AppState::Menu), menu::setup_menu)
+        .add_systems(Update, menu::menu_action.run_if(in_state(AppState::Menu)))
+        .add_systems(OnExit(AppState::Menu), menu::cleanup_menu)
+        .add_systems(OnEnter(AppState::InGame), game_setup::setup)
         // Add our gameplay simulation systems to the fixed timestep schedule
         // which runs at 64 Hz by default
         .add_systems(
@@ -49,19 +52,11 @@ fn main() {
                 .chain()
                 .run_if(in_state(AppState::InGame)),
         )
-        .add_systems(OnExit(AppState::Menu), menu::cleanup_menu)
         .add_systems(
             Update,
-            (score_board::update_scoreboard).run_if(in_state(AppState::InGame)),
+            (score_board::update_scoreboard, spawner::respawn_bricks)
+                .chain()
+                .run_if(in_state(AppState::InGame)),
         )
-        .add_systems(
-            Update,
-            (bevy::window::close_on_esc).run_if(in_state(AppState::InGame)),
-        )
-        .add_systems(
-            Update,
-            (spawner::respawn_bricks).run_if(in_state(AppState::InGame)),
-        )
-        .add_systems(Update, menu::menu_action.run_if(in_state(AppState::Menu)))
         .run();
 }
