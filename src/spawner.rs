@@ -17,9 +17,6 @@ pub fn spawn_initial_entities(
     mut materials: ResMut<Assets<ColorMaterial>>,
     asset_server: Res<AssetServer>,
 ) {
-    // Camera
-    commands.spawn(Camera2dBundle::default());
-
     // Sound
     let ball_collision_sound = asset_server.load("sounds/breakout_collision.ogg");
     commands.insert_resource(CollisionSound::new(ball_collision_sound));

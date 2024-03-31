@@ -1,5 +1,10 @@
 use bevy::prelude::*;
 
+// Menu constants
+pub const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
+pub const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
+pub const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
+
 // These constants are defined in `Transform` units.
 // Using the default 2D camera they correspond 1:1 with screen pixels.
 pub const PADDLE_SIZE: Vec3 = Vec3::new(120.0, 20.0, 0.0);
