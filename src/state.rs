@@ -1,3 +1,6 @@
+pub mod in_game;
+pub mod menu;
+
 use bevy::ecs::schedule::States;
 
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]

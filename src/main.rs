@@ -6,8 +6,6 @@ mod collision;
 mod collision_sound;
 mod component;
 mod constants;
-mod game_setup;
-mod menu;
 mod physics;
 mod score_board;
 mod spawner;
@@ -22,7 +20,7 @@ use colision_event::CollisionEvent;
 use component::{ball::Ball, paddle};
 use constants::*;
 use score_board::Scoreboard;
-use state::AppState;
+use state::{in_game, menu, AppState};
 use velocity::Velocity;
 use wall_location::WallLocation;
 
@@ -37,7 +35,7 @@ fn main() {
         .add_systems(OnEnter(AppState::Menu), menu::setup_menu)
         .add_systems(Update, menu::menu_action.run_if(in_state(AppState::Menu)))
         .add_systems(OnExit(AppState::Menu), menu::cleanup_menu)
-        .add_systems(OnEnter(AppState::InGame), game_setup::setup)
+        .add_systems(OnEnter(AppState::InGame), in_game::setup)
         // Add our gameplay simulation systems to the fixed timestep schedule
         // which runs at 64 Hz by default
         .add_systems(

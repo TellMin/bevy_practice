@@ -1,9 +1,12 @@
 use crate::{
     colider::Collider,
     collision_sound::CollisionSound,
-    component::ball::Ball,
-    component::brick::{Brick, STAGE_LAYOUT},
+    component::{
+        ball::Ball,
+        brick::{Brick, STAGE_LAYOUT},
+    },
     constants::*,
+    in_game::InGameData,
     paddle::Paddle,
     velocity::Velocity,
     wall_bundle::WallBundle,
@@ -24,71 +27,87 @@ pub fn spawn_initial_entities(
     // Paddle
     let paddle_y = BOTTOM_WALL + GAP_BETWEEN_PADDLE_AND_FLOOR;
 
-    commands.spawn((
-        SpriteBundle {
-            transform: Transform {
-                translation: Vec3::new(0.0, paddle_y, 0.0),
-                scale: PADDLE_SIZE,
-                ..default()
-            },
-            sprite: Sprite {
-                color: PADDLE_COLOR,
-                ..default()
-            },
-            ..default()
-        },
-        Paddle,
-        Collider,
-    ));
-
-    // Ball
-    commands.spawn((
-        MaterialMesh2dBundle {
-            mesh: meshes.add(Circle::default()).into(),
-            material: materials.add(ColorMaterial::from(BALL_COLOR)),
-            transform: Transform::from_translation(BALL_STARTING_POSITION)
-                .with_scale(Vec2::splat(BALL_DIAMETER).extend(1.)),
-            ..default()
-        },
-        Ball,
-        Velocity::new(INITIAL_BALL_DIRECTION.normalize() * BALL_SPEED),
-    ));
-
-    // Scoreboard
-    commands.spawn(
-        TextBundle::from_sections([
-            TextSection::new(
-                "Score: ",
-                TextStyle {
-                    font_size: SCOREBOARD_FONT_SIZE,
-                    color: TEXT_COLOR,
+    let paddle = commands
+        .spawn((
+            SpriteBundle {
+                transform: Transform {
+                    translation: Vec3::new(0.0, paddle_y, 0.0),
+                    scale: PADDLE_SIZE,
                     ..default()
                 },
-            ),
-            TextSection::from_style(TextStyle {
-                font_size: SCOREBOARD_FONT_SIZE,
-                color: SCORE_COLOR,
+                sprite: Sprite {
+                    color: PADDLE_COLOR,
+                    ..default()
+                },
+                ..default()
+            },
+            Paddle,
+            Collider,
+        ))
+        .id();
+
+    // Ball
+    let ball = commands
+        .spawn((
+            MaterialMesh2dBundle {
+                mesh: meshes.add(Circle::default()).into(),
+                material: materials.add(ColorMaterial::from(BALL_COLOR)),
+                transform: Transform::from_translation(BALL_STARTING_POSITION)
+                    .with_scale(Vec2::splat(BALL_DIAMETER).extend(1.)),
+                ..default()
+            },
+            Ball,
+            Velocity::new(INITIAL_BALL_DIRECTION.normalize() * BALL_SPEED),
+        ))
+        .id();
+
+    // Scoreboard
+    let score_board = commands
+        .spawn(
+            TextBundle::from_sections([
+                TextSection::new(
+                    "Score: ",
+                    TextStyle {
+                        font_size: SCOREBOARD_FONT_SIZE,
+                        color: TEXT_COLOR,
+                        ..default()
+                    },
+                ),
+                TextSection::from_style(TextStyle {
+                    font_size: SCOREBOARD_FONT_SIZE,
+                    color: SCORE_COLOR,
+                    ..default()
+                }),
+            ])
+            .with_style(Style {
+                position_type: PositionType::Absolute,
+                top: SCOREBOARD_TEXT_PADDING,
+                left: SCOREBOARD_TEXT_PADDING,
                 ..default()
             }),
-        ])
-        .with_style(Style {
-            position_type: PositionType::Absolute,
-            top: SCOREBOARD_TEXT_PADDING,
-            left: SCOREBOARD_TEXT_PADDING,
-            ..default()
-        }),
-    );
+        )
+        .id();
 
     // Walls
-    commands.spawn(WallBundle::new(WallLocation::Left));
-    commands.spawn(WallBundle::new(WallLocation::Right));
-    commands.spawn(WallBundle::new(WallLocation::Bottom));
-    commands.spawn(WallBundle::new(WallLocation::Top));
+    let walls = vec![
+        commands.spawn(WallBundle::new(WallLocation::Left)).id(),
+        commands.spawn(WallBundle::new(WallLocation::Right)).id(),
+        commands.spawn(WallBundle::new(WallLocation::Bottom)).id(),
+        commands.spawn(WallBundle::new(WallLocation::Top)).id(),
+    ];
 
-    spawn_brick(&mut commands);
+    let bricks = spawn_brick(&mut commands);
+
+    commands.insert_resource(InGameData {
+        ball,
+        paddle,
+        walls,
+        bricks,
+        score_board,
+    });
 }
 
-fn spawn_brick(commands: &mut Commands) {
+fn spawn_brick(commands: &mut Commands) -> Vec<Entity> {
     let brick_size_x = (RIGHT_WALL
         - LEFT_WALL
         - GAP_BETWEEN_BRICKS * (STAGE_LAYOUT[0].len() as f32 - 1.0)
@@ -104,6 +123,8 @@ fn spawn_brick(commands: &mut Commands) {
     let offset_x = LEFT_WALL + brick_size_x / 2. + GAP_BETWEEN_BRICKS_AND_CEILING;
     let offset_y = TOP_WALL - brick_size_y / 2. - GAP_BETWEEN_BRICKS_AND_SIDES;
 
+    let mut bricks: Vec<Entity> = Vec::new();
+
     for (row_index, row) in STAGE_LAYOUT.iter().enumerate() {
         for (column_index, &cell) in row.iter().enumerate() {
             if cell == 1 {
@@ -113,37 +134,44 @@ fn spawn_brick(commands: &mut Commands) {
                 );
 
                 // brick
-                commands.spawn((
-                    SpriteBundle {
-                        sprite: Sprite {
-                            color: BRICK_COLOR,
+                let brick = commands
+                    .spawn((
+                        SpriteBundle {
+                            sprite: Sprite {
+                                color: BRICK_COLOR,
+                                ..default()
+                            },
+                            transform: Transform {
+                                translation: brick_position.extend(0.0),
+                                scale: Vec3::new(brick_size_x, brick_size_y, 1.0),
+                                ..default()
+                            },
                             ..default()
                         },
-                        transform: Transform {
-                            translation: brick_position.extend(0.0),
-                            scale: Vec3::new(brick_size_x, brick_size_y, 1.0),
-                            ..default()
-                        },
-                        ..default()
-                    },
-                    Brick,
-                    Collider,
-                ));
+                        Brick,
+                        Collider,
+                    ))
+                    .id();
+
+                bricks.push(brick);
             }
         }
     }
+    return bricks;
 }
 
 pub fn respawn_bricks(
     mut commands: Commands,
     keyboard_input: Res<ButtonInput<KeyCode>>,
     brick_query: Query<Entity, With<Brick>>,
+    mut in_game_data: ResMut<InGameData>,
 ) {
     if keyboard_input.just_pressed(KeyCode::KeyR) {
         for brick_entity in &brick_query {
             commands.entity(brick_entity).despawn();
         }
 
-        spawn_brick(&mut commands);
+        let bricks = spawn_brick(&mut commands);
+        in_game_data.set_bricks(bricks);
     }
 }
